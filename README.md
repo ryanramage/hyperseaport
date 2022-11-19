@@ -20,7 +20,7 @@ npm i -g hyperseaport
 
 # 1. Generate a unique seed for your registry
 
-Your registry is unique! The seed ensures a unique and consistent public key so only those who know the public key can connet and uses the services the registry maintains
+Your registry is unique! The seed ensures a unique and consistent public key. Only those who know the public key can connect and uses the services the registry maintains.
 
 ```
 $ hyperseaport seed
@@ -44,7 +44,7 @@ Registry listening. Connect with pubkey  5b64a8956d8f2404c4f4b4e6f402ef439f610f7
 # 3. Register a service
 
 Here is an example that registers couchdb running on localhost port (-p) 5984 as a service.
-The role (-r) of the service a semver string that represents the name and version of the running instace
+The role (-r) of the service a semver string that represents the name and version of the running instace.
 We use the registry publicKey from step 2 to find and connect to the registry, and register our service.
 
 The code below can be run on the same different host than step 2, and it automagically connects and registers the service.
