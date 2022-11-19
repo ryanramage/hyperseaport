@@ -20,9 +20,9 @@
   "author": "Ryan Ramage",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ryanramage/hyperswarm-seaport/issues"
+    "url": "https://github.com/ryanramage/hyperseaport/issues"
   },
-  "homepage": "https://github.com/ryanramage/hyperswarm-seaport#readme",
+  "homepage": "https://github.com/ryanramage/hyperseaport#readme",
   "devDependencies": {
     "standard": "^16.0.4"
   },
