@@ -5,6 +5,12 @@ service registry and tcp proxy over secure p2p
 
 ![Seaport](https://web.archive.org/web/20141205152524im_/http://substack.net/images/seaport.png "Seaport")
 
+# Install
+
+```
+npm i -g hyperseaport
+```
+
 
 # 1. Generate a seed for your registry public key
 
