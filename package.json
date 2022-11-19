@@ -1,0 +1,38 @@
+{
+  "name": "hyperseaport",
+  "version": "1.0.0",
+  "description": "service registry and tcp proxy over secure p2p",
+  "main": "lib/service.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanramage/hyperseaport.git"
+  },
+  "keywords": [
+    "hyperswarm",
+    "seaport",
+    "p2p",
+    "service",
+    "registry"
+  ],
+  "author": "Ryan Ramage",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ryanramage/hyperswarm-seaport/issues"
+  },
+  "homepage": "https://github.com/ryanramage/hyperswarm-seaport#readme",
+  "devDependencies": {
+    "standard": "^16.0.4"
+  },
+  "dependencies": {
+    "@hyperswarm/dht": "^6.2.0",
+    "hypertele": "^1.0.31",
+    "json-rpc-on-a-stream": "^1.0.0",
+    "rc": "^1.2.8",
+    "semver": "^7.3.5",
+    "semver-store": "^0.3.0",
+    "sodium-universal": "^3.1.0"
+  }
+}
