@@ -24,10 +24,12 @@ services and proxies will connect with pubkey 5b64a8956d8f2404c4f4b4e6f402ef439f
 
 # 2. Start a registry
 
-```
-$ hyperseaport registry --seed 479fd3d618e9f125d068a5b226f971c7ee393ff783b60e63fab6cb78325acd45
+Grab the seed from step 1 and use it to boot the registry. 
 
-Registry listening. Connect with pubkey 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45
+```
+$ hyperseaport registry --seed c84c7034a0309479299d81468b7bc59592a96b3a919fd1ff159aea1879407382
+
+Registry listening. Connect with pubkey  5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45
 
 ```
 
