@@ -5,14 +5,22 @@ service registry and tcp proxy over secure p2p
 
 ![Seaport](https://web.archive.org/web/20141205152524im_/http://substack.net/images/seaport.png "Seaport")
 
+Kind of like [ngrok](https://ngrok.com) but with
+
+ 1. A private registry of services and
+ 2. Over p2p
+
+As your micro service architecture grows to span many processes on many machines just register your services and easily find and connect them together.
+
 # Install
 
 ```
 npm i -g hyperseaport
 ```
 
+# 1. Generate a unique seed for your registry
 
-# 1. Generate a seed for your registry public key
+Your registry is unique! The seed ensures a unique and consistent public key so only those who know the public key can connet and uses the services the registry maintains
 
 ```
 $ hyperseaport seed
@@ -24,7 +32,7 @@ services and proxies will connect with pubkey 5b64a8956d8f2404c4f4b4e6f402ef439f
 
 # 2. Start a registry
 
-Grab the seed from step 1 and use it to boot the registry. 
+Grab the seed from step 1 and use it to boot the registry.
 
 ```
 $ hyperseaport registry --seed c84c7034a0309479299d81468b7bc59592a96b3a919fd1ff159aea1879407382
@@ -35,10 +43,11 @@ Registry listening. Connect with pubkey  5b64a8956d8f2404c4f4b4e6f402ef439f610f7
 
 # 3. Register a service
 
-Semver is used for identify the service. Here is an example that uses couchdb running on localhost on port 5984
-We pass the registry publicKey from above so it can store the port (p) and role (r) couchdb@3.2.2
+Here is an example that registers couchdb running on localhost port (-p) 5984 as a service.
+The role (-r) of the service a semver string that represents the name and version of the running instace
+We use the registry publicKey from step 2 to find and connect to the registry, and register our service.
 
-The code below can be run on a different host than step 2, and it automagically connects and registers the service to the registry above.
+The code below can be run on the same different host than step 2, and it automagically connects and registers the service.
 
 ```
 $ hyperseaport service 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45  -p 5984 -r couchdb@3.2.2
@@ -54,11 +63,17 @@ registered service {
 }
 ```
 
+Note: for service registration the server version should be exact
+
 # 4. Register a proxy
 
-This can be done on a different host then the steps above.
+This is the part that is like ngrok, or a reverse proxy. You want to USE the service somewhere else, without knowing the IP, or vpn.
+So you start a hyperseaport proxy on a port that makes it look like the service is running locally on that port.
 
-Lookup the service by a role (r) and expose the service locally on a totally different port (p)
+This can be done on the same or different host then the steps above.
+
+Lookup the service by a role (r) and expose the service locally on a totally different port (p).
+We use the registry publicKey from step 2 to find and connect to the registry, and find the service.
 
 ```
 $ hyperseaport proxy 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45 -p 5985 -r couchdb@3.x
@@ -79,6 +94,8 @@ found service {
 proxy from  5985 to p2p service abe213285052e5c2f2166d144afcd71e31aa5c7d72656d7b956a2c93f76d260f
 
 ```
+
+Note: for service discovery, the version can be a semver range.
 
 # 5. Use the service locally
 
