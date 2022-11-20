@@ -1,3 +1,4 @@
+const HyperDHT = require('@hyperswarm/dht')
 const fixMeta = require('./lib/fixMeta')
 const Service = require('./lib/service')
 const LocalRegistry = require('./lib/localRegistry')
@@ -14,8 +15,9 @@ module.exports = (options) => {
   const allow = options.allow // a list of publicKeys allowed to access the service
   const localRegistry = options.localRegistry || LocalRegistry(registryPubKey)
   const meta = fixMeta(role)
+  const dht = options.dht || new HyperDHT()
 
-  const internals = { dht: null, getStats: null, localRegistry }
+  const internals = { dht, localRegistry, getStats: null }
 
   // allow the caller to inspect and clean up things
   const getInternals = () => internals
@@ -25,7 +27,7 @@ module.exports = (options) => {
   }
 
   const setup = () => new Promise((resolve, reject) => {
-    Service(port, host, keyPair, allow).then(({ dht, getStats }) => {
+    Service({ port, host, keyPair, allow, dht }).then(({ dht, getStats }) => {
       localRegistry.connect().then(() => {
         localRegistry.register(meta, keyPair.publicKey)
         resolve()
