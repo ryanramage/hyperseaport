@@ -15,9 +15,9 @@ module.exports = (roles, options) => {
 
   const createService = ({ role, port }, cb) => {
     const meta = fixMeta(role)
-    const complete = ({ getStats }) => cb(null, { role, port, meta, getStats })
-    const onService = servicePublicKey => Proxy(port, keyPair, servicePublicKey, dht)
-      .then(complete).catch(cb)
+    const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats })
+    const onService = servicePublicKey => Proxy({ port, servicePublicKey, dht })
+      .then(onComplete).catch(cb)
 
     localRegistry.waitFor(meta).then(onService).catch(cb)
   }
