@@ -2,7 +2,7 @@
   "name": "hyperseaport",
   "version": "1.0.0",
   "description": "service registry and tcp proxy over secure p2p",
-  "main": "lib/service.js",
+  "main": "./index.js",
   "scripts": {
     "test": "standard"
   },
@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "@hyperswarm/dht": "^6.2.0",
+    "async": "^3.2.4",
+    "getports": "^1.0.2",
     "hypertele": "^1.0.31",
     "json-rpc-on-a-stream": "^1.0.0",
     "rc": "^1.2.8",
