@@ -21,9 +21,9 @@ module.exports = (options) => {
 
   // allow the caller to inspect and clean up things
   const getInternals = () => internals
-  const destroy = () => {
-    dht.destroy()
+  const destroy = () => {  
     localRegistry.destroy()
+    return dht.destroy()
   }
 
   const setup = () => new Promise((resolve, reject) => {

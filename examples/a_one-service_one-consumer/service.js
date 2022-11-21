@@ -12,11 +12,11 @@ const server = http.createServer(requestListener)
 server.listen(port)
 
 // The intersting stuff!!
-const registryPubKey = process.argv[2] // we need one thing from the cli!
+const registryPubKey = process.argv[2] // we need one thing from the cli
 const role = 'helloworld@1.0.0'
 const keyPair = KeyPair()
 const service = Service({ registryPubKey, role, port, keyPair })
-service.setup()
+service.setup().then(() => console.log('service connected'))
 
 process.once('SIGINT', function () {
   service.destroy()
