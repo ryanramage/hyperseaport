@@ -18,6 +18,9 @@ As your micro service architecture grows to span many processes on many machines
 npm i -g hyperseaport
 ```
 
+The following instructions are for the CLI usage. See the [examples](https://github.com/ryanramage/hyperseaport/tree/master/examples) directory for usage as a module in a node app to register or consume services.
+
+
 # 1. Generate a unique seed for your registry
 
 Your registry is unique! The seed ensures a unique and consistent public key. Only those who know the public key can connect and uses the services the registry maintains.
