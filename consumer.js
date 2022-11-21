@@ -13,21 +13,12 @@ module.exports = (roles, options) => {
   const localRegistry = options.localRegistry || LocalRegistry(registryPubKey)
   const dht = options.dht || new HyperDHT(keyPair)
 
-  const createService = ({ role, port }, cb) => {
-    const meta = fixMeta(role)
-    const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats })
-    const onService = servicePublicKey => Proxy({ port, servicePublicKey, dht })
-      .then(onComplete).catch(cb)
-
-    localRegistry.waitFor(meta).then(onService).catch(cb)
-  }
-
-  const internals = { dht, localRegistry, connected: null }
+  const internals = { dht, localRegistry, connected: [] }
 
   // allow the caller to inspect and clean up things
   const getInternals = () => internals
   const destroy = () => {
-    if (dht) dht.destroy()
+    dht.destroy()
     localRegistry.destroy()
   }
 
@@ -38,7 +29,7 @@ module.exports = (roles, options) => {
     }
     parallel(tasks, (err, { ports }) => {
       if (err) return reject(err)
-      const todo = roles.map((role, i) => ({ role, port: ports[i] }))
+      const todo = roles.map((role, i) => ({ localRegistry, dht, role, port: ports[i] }))
       map(todo, 1, createService, (err, connected) => {
         if (err) return reject(err)
         internals.connected = connected
@@ -48,4 +39,13 @@ module.exports = (roles, options) => {
   })
 
   return { setup, getInternals, destroy }
+}
+
+function createService ({ localRegistry, dht, role, port }, cb) {
+  const meta = fixMeta(role)
+  const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats })
+  const onService = servicePublicKey => Proxy({ port, servicePublicKey, dht })
+    .then(onComplete).catch(cb)
+
+  localRegistry.waitFor(meta).then(onService).catch(cb)
 }

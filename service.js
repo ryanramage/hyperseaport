@@ -22,7 +22,7 @@ module.exports = (options) => {
   // allow the caller to inspect and clean up things
   const getInternals = () => internals
   const destroy = () => {
-    if (dht) dht.destroy()
+    dht.destroy()
     localRegistry.destroy()
   }
 

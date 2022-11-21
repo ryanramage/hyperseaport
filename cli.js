@@ -23,7 +23,10 @@ function service (registryPubKey, role, port, keyPair, allow) {
     process.exit(1)
   }
   const meta = fixMeta(role)
-  Service(port, '127.0.0.1', keyPair, allow).then(({ dht, getStats }) => {
+  const dht = new HyperDHT()
+  const host = '127.0.0.1'
+  const options = {host, port, dht, keyPair}
+  Service(options).then(({ dht, getStats }) => {
     console.log('started p2p service on', keyPair.publicKey.toString('hex'))
     const localRegistry = LocalRegistry(registryPubKey)
     localRegistry.connect().then(() => {
@@ -39,11 +42,12 @@ function service (registryPubKey, role, port, keyPair, allow) {
 function proxy (registryPubKey, role, port, keyPair, portOptions) {
   const meta = fixMeta(role)
   const localRegistry = LocalRegistry(registryPubKey)
+  const dht = new HyperDHT(keyPair)
   localRegistry.connect().then(() => {
     console.log('connected to registry')
     localRegistry.waitFor(meta).then(servicePublicKey => {
       const withPort = (port) => {
-        Proxy(port, keyPair, servicePublicKey).then(({ dht, getStats }) => {
+        Proxy({port, servicePublicKey, dht}).then(({ getStats }) => {
           console.log('proxy from ', port, 'to p2p service', servicePublicKey)
           process.once('SIGINT', function () {
             dht.destroy()
