@@ -37,9 +37,7 @@ registryPublicKey=5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d
 ```
 The registrySeed should be secret! It's what makes your registry your own.
 The registryPublicKey should be shared so services and consumers can connect and use.
-To make the instructions cleaner below we dont show passing this option, as the cli will just read this file as a first priory.
 
-This file is read each time by hyperseaport according to the [rc](https://www.npmjs.com/package/rc) rules.
 
 ### 2. Start a registry
 
@@ -74,6 +72,11 @@ registered service {
 ```
 
 Note: for service registration the server version should be exact
+Note: The command here is reading ~/.config/hyperseaport for the registry. It you are on another computer pass in the registry public key
+
+```
+$ hyperseaport service --registry 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45 --port 5984 --role couchdb@3.2.2
+```
 
 ### 4. Register a proxy
 
@@ -106,8 +109,13 @@ proxy from  5985 to p2p service abe213285052e5c2f2166d144afcd71e31aa5c7d72656d7b
 ```
 
 Note: for service discovery, the version can be a semver range.
+Note: The command here is reading ~/.config/hyperseaport for the registry. It you are on another computer pass in the registry public key
 
-### 5. Use the service locally
+```
+$ hyperseaport proxy --registry 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45 --port 5985 --role couchdb@3.x
+```
+
+### 5. Use the service
 
 Now port 5985 is proxied to the remote service without knowing where it is. Magic. Call it normally
 
@@ -119,9 +127,9 @@ $ curl http://localhost:5985
 
 # Node Usage
 
-When you write a node webserver or other service on a port, you can register it very easy like so
+Create a service
 
-````
+```
 const {Service, KeyPair} = require('hypersearport')
 
 // Boilerplate node
@@ -147,9 +155,10 @@ console.log('service connected')
 process.once('SIGINT', function () {
   service.destroy()
 })
+
 ```
 
-and then if you want to consume services, here is an example how you'd look it up and call it
+Consume the service from another process
 
 ```
 const {Consumer} = require('hypersearport')
