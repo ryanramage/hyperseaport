@@ -8,12 +8,12 @@ const LocalRegistry = require('./lib/localRegistry')
 
 module.exports = (options) => {
   // required things
-  const { registryPubKey, role, port, keyPair } = options
+  const { registryPublicKey, role, port, keyPair } = options
 
   // optional things
   const host = options.host || '127.0.0.1'
   const allow = options.allow // a list of publicKeys allowed to access the service
-  const localRegistry = options.localRegistry || LocalRegistry(registryPubKey)
+  const localRegistry = options.localRegistry || LocalRegistry(registryPublicKey)
   const meta = fixMeta(role)
   const dht = options.dht || new HyperDHT()
 
@@ -21,7 +21,7 @@ module.exports = (options) => {
 
   // allow the caller to inspect and clean up things
   const getInternals = () => internals
-  const destroy = () => {  
+  const destroy = () => {
     localRegistry.destroy()
     return dht.destroy()
   }

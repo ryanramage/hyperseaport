@@ -8,17 +8,17 @@ const Proxy = require('./lib/proxy')
 
 module.exports = (roles, options) => {
   // required things
-  const { registryPubKey, keyPair } = options
+  const { registryPublicKey, keyPair } = options
 
   // optional things
-  const localRegistry = options.localRegistry || LocalRegistry(registryPubKey)
+  const localRegistry = options.localRegistry || LocalRegistry(registryPublicKey)
   const dht = options.dht || new HyperDHT(keyPair)
 
   const internals = { dht, localRegistry, connected: [] }
 
   // allow the caller to inspect and clean up things
   const getInternals = () => internals
-  const destroy = () => {    
+  const destroy = () => {
     localRegistry.destroy()
     return dht.destroy()
   }
