@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "@hyperswarm/dht": "^6.2.0",
+    "@opentelemetry/host-metrics": "^0.31.0",
+    "@opentelemetry/sdk-metrics": "^1.8.0",
     "async": "^3.2.4",
     "getports": "^1.0.2",
     "hypertele": "1.0.31",
