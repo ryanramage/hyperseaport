@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/ryanramage/hyperseaport#readme",
   "devDependencies": {
+    "memory-level": "^1.0.0",
     "standard": "^16.0.4"
   },
   "dependencies": {
@@ -35,10 +36,12 @@
     "getports": "^1.0.2",
     "hypertele": "1.0.31",
     "json-rpc-on-a-stream": "^1.0.0",
+    "level": "^8.0.0",
     "rc": "^1.2.8",
     "semver": "^7.3.5",
     "semver-store": "^0.3.0",
-    "sodium-universal": "^3.1.0"
+    "sodium-universal": "^3.1.0",
+    "tape": "^5.6.1"
   },
   "volta": {
     "node": "18.12.1"
