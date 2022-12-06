@@ -1,10 +1,10 @@
 const test = require('tape')
 const { MemoryLevel } = require('memory-level')
-const ConsumerLookup = require('../lib/impl/consumerLookup/level')
+const ConsumerLookup = require('../lib/registryServerImpl/consumerLookup')
 
 test('find exact match', async (t) => {
   const db = new MemoryLevel({ valueEncoding: 'json' })
-  const cl = ConsumerLookup({ db })
+  const cl = ConsumerLookup(db)
   await cl.add('couchdb', '2.1.0', '3b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.1.1', '4b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.1.2', '5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
@@ -17,7 +17,7 @@ test('find exact match', async (t) => {
 
 test('find with a patch wildcard', async (t) => {
   const db = new MemoryLevel({ valueEncoding: 'json' })
-  const cl = ConsumerLookup({ db })
+  const cl = ConsumerLookup(db)
   await cl.add('couchdb', '2.1.0', '3b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.1.x', '4b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.1.2', '5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
@@ -30,7 +30,7 @@ test('find with a patch wildcard', async (t) => {
 
 test('find with a minor wildcard', async (t) => {
   const db = new MemoryLevel({ valueEncoding: 'json' })
-  const cl = ConsumerLookup({ db })
+  const cl = ConsumerLookup(db)
   await cl.add('couchdb', '2.1.0', '3b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.x.x', '4b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.1.2', '5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
@@ -43,7 +43,7 @@ test('find with a minor wildcard', async (t) => {
 
 test('find with prerelease tags works', async (t) => {
   const db = new MemoryLevel({ valueEncoding: 'json' })
-  const cl = ConsumerLookup({ db })
+  const cl = ConsumerLookup(db)
   await cl.add('couchdb', '2.1.0', '3b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.1.1-beta.2', '4b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.1.1-beta.3', '5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
@@ -58,7 +58,7 @@ test('find with prerelease tags works', async (t) => {
 
 test('remove a consumer and make sure it does not match', async (t) => {
   const db = new MemoryLevel({ valueEncoding: 'json' })
-  const cl = ConsumerLookup({ db })
+  const cl = ConsumerLookup(db)
   await cl.add('couchdb', '2.x.x', '3b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.x.x', '4b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
   await cl.add('couchdb', '2.1.2', '5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45')
