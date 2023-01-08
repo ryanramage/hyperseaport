@@ -5,7 +5,7 @@
   "main": "./index.js",
   "bin": "./cli.js",
   "scripts": {
-    "test": "standard"
+    "test": "standard && tap"
   },
   "repository": {
     "type": "git",

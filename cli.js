@@ -62,12 +62,8 @@ function proxy (options) {
   localRegistry.connect().then(() => {
     console.log('connected to registry')
     localRegistry.waitFor(meta).then(servicePublicKey => {
-
       const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, servicePublicKey)
-      const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats, servicePublicKeyLookup })
-      Proxy({ port, servicePublicKeyLookup, dht }).then(onComplete).catch(cb)
-
-      Proxy({ port, servicePublicKey, dht }).then(({ getStats }) => {
+      Proxy({ port, servicePublicKeyLookup, dht }).then(({ getStats }) => {
         console.log('proxy from ', port, 'to p2p service', servicePublicKey)
         process.once('SIGINT', function () {
           dht.destroy()
