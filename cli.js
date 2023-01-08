@@ -6,8 +6,9 @@ const randomBytes = require('./lib/randomBytes')
 const LocalRegistry = require('./lib/localRegistry')
 const RegistryServer = require('./lib/registryServer')
 const SimpleMemoryRegistry = require('./lib/impl/simpleMemoryRegistry')
+const ServicePublicKeyLookup = require('./lib/impl/servicePublicKeyLookup')
 const Service = require('./lib/service')
-const Proxy = require('./lib/proxy')
+const Proxy = require('./lib/proxyDynamic')
 
 function registry (options) {
   const seedStr = options.registrySeed || randomBytes(32).toString('hex')
@@ -54,13 +55,18 @@ function proxy (options) {
   const meta = fixMeta(role)
   const localRegistry = LocalRegistry(registryPublicKey)
   const seedStr = options.seed || randomBytes(32).toString('hex')
+  const loadBalanceOptions = options.loadBalanceOptions || {}
   const seed = Buffer.from(seedStr, 'hex')
   const keyPair = HyperDHT.keyPair(seed)
   const dht = new HyperDHT(keyPair)
   localRegistry.connect().then(() => {
     console.log('connected to registry')
     localRegistry.waitFor(meta).then(servicePublicKey => {
-      console.log('starting', port, servicePublicKey)
+
+      const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, servicePublicKey)
+      const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats, servicePublicKeyLookup })
+      Proxy({ port, servicePublicKeyLookup, dht }).then(onComplete).catch(cb)
+
       Proxy({ port, servicePublicKey, dht }).then(({ getStats }) => {
         console.log('proxy from ', port, 'to p2p service', servicePublicKey)
         process.once('SIGINT', function () {

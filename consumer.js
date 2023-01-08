@@ -4,7 +4,8 @@ const parallel = require('async/parallel')
 const HyperDHT = require('@hyperswarm/dht')
 const fixMeta = require('./lib/fixMeta')
 const LocalRegistry = require('./lib/localRegistry')
-const Proxy = require('./lib/proxy')
+const ServicePublicKeyLookup = require('./lib/impl/servicePublicKeyLookup')
+const Proxy = require('./lib/proxyDynamic')
 
 module.exports = (roles, options) => {
   // required things
@@ -13,6 +14,7 @@ module.exports = (roles, options) => {
   // optional things
   const localRegistry = options.localRegistry || LocalRegistry(registryPublicKey)
   const dht = options.dht || new HyperDHT(keyPair)
+  const loadBalanceOptions = options.loadBalanceOptions || {}
 
   const internals = { dht, localRegistry, connected: [] }
 
@@ -44,9 +46,11 @@ module.exports = (roles, options) => {
 
 function createService ({ localRegistry, dht, role, port }, cb) {
   const meta = fixMeta(role)
-  const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats })
-  const onService = servicePublicKey => Proxy({ port, servicePublicKey, dht })
-    .then(onComplete).catch(cb)
+  const onService = servicePublicKey => {
+    const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, servicePublicKey)
+    const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats, servicePublicKeyLookup })
+    Proxy({ port, servicePublicKeyLookup, dht }).then(onComplete).catch(cb)
+  }
 
   localRegistry.waitFor(meta).then(onService).catch(cb)
 }
