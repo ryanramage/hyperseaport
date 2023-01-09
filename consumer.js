@@ -32,7 +32,7 @@ module.exports = (roles, options) => {
     }
     parallel(tasks, (err, { ports }) => {
       if (err) return reject(err)
-      const todo = roles.map((role, i) => ({ localRegistry, loadBalanceOptions, dht, role, port: ports[i] }))
+      const todo = roles.map((role, i) => ({ localRegistry, loadBalanceOptions, keyPair, dht, role, port: ports[i] }))
       map(todo, 1, createService, (err, connected) => {
         if (err) return reject(err)
         internals.connected = connected
@@ -44,10 +44,10 @@ module.exports = (roles, options) => {
   return { setup, getInternals, destroy }
 }
 
-function createService ({ localRegistry, loadBalanceOptions, dht, role, port }, cb) {
+function createService ({ localRegistry, loadBalanceOptions, keyPair, dht, role, port }, cb) {
   const meta = fixMeta(role)
   const onService = servicePublicKey => {
-    const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, servicePublicKey)
+    const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, keyPair, servicePublicKey)
     const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats, servicePublicKeyLookup })
     Proxy({ port, servicePublicKeyLookup, dht }).then(onComplete).catch(cb)
   }
