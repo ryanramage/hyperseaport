@@ -46,11 +46,7 @@ module.exports = (roles, options) => {
 
 function createService ({ localRegistry, loadBalanceOptions, keyPair, dht, role, port }, cb) {
   const meta = fixMeta(role)
-  const onService = servicePublicKey => {
-    const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, keyPair, servicePublicKey)
-    const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats, servicePublicKeyLookup })
-    Proxy({ port, servicePublicKeyLookup, dht }).then(onComplete).catch(cb)
-  }
-
-  localRegistry.waitFor(meta).then(onService).catch(cb)
+  const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, keyPair)
+  const onComplete = ({ getStats }) => cb(null, { role, port, meta, getStats, servicePublicKeyLookup })
+  Proxy({ port, servicePublicKeyLookup, dht }).then(onComplete).catch(cb)
 }
