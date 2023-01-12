@@ -4,22 +4,29 @@ const HyperDHT = require('@hyperswarm/dht')
 const fixMeta = require('./lib/fixMeta')
 const randomBytes = require('./lib/randomBytes')
 const LocalRegistry = require('./lib/localRegistry')
-const RegistryServer = require('./lib/registryServer')
-const SimpleMemoryRegistry = require('./lib/impl/simpleMemoryRegistry')
+const Registrar = require('./lib/registrar')
+const WriterRegistry = require('./lib/impl/WriterRegistry')
 const ServicePublicKeyLookup = require('./lib/impl/servicePublicKeyLookup')
 const Service = require('./lib/service')
 const Proxy = require('./lib/proxyDynamic')
+const dataDir = require('./lib/dataDir')
 
 function registry (options) {
   const seedStr = options.registrySeed || randomBytes(32).toString('hex')
   const seed = Buffer.from(seedStr, 'hex')
   const keyPair = HyperDHT.keyPair(seed)
 
-  const registry = SimpleMemoryRegistry()
-  const registryServer = RegistryServer(registry, options.dhtOptions, keyPair)
-  registryServer.start().then(keyPair => {
-    console.log('Registry started')
-    console.log(`registryPublicKey=${keyPair.publicKey.toString('hex')}`)
+  const storageDir = options.registryDir || dataDir('hyperseaport')
+
+  const writerRegistry = WriterRegistry(storageDir)
+  writerRegistry.start().then(writerKey => {
+    console.log('Writer started.')
+    console.log(`storing in ${storageDir}`)
+    const registrar = Registrar(writerRegistry, options.dhtOptions, keyPair)
+    registrar.start().then(keyPair => {
+      console.log('Registry started.')
+      console.log(`registryPublicKey=${keyPair.publicKey.toString('hex')}`)
+    })
   })
 }
 
