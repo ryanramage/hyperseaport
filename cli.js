@@ -68,18 +68,11 @@ function proxy (options) {
   const dht = new HyperDHT(keyPair)
   localRegistry.connect().then(() => {
     console.log('connected to registry')
-    localRegistry.waitFor(meta).then(servicePublicKey => {
-      const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, keyPair, servicePublicKey)
-      Proxy({ port, servicePublicKeyLookup, dht }).then(({ getStats }) => {
-        console.log('proxy from ', port, 'to p2p service', servicePublicKey)
-        process.once('SIGINT', function () {
-          dht.destroy()
-        })
+    const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, keyPair)
+    Proxy({ port, servicePublicKeyLookup, dht }).then(({ getStats }) => {
+      process.once('SIGINT', function () {
+        dht.destroy()
       })
-    }).catch(e => {
-      console.log('unable to find service', e)
-      localRegistry.destroy()
-      process.exit(-1)
     })
   })
 }
