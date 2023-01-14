@@ -46,7 +46,8 @@ function service (options) {
   const opts = { host, port, dht, keyPair }
   Service(opts).then(({ dht, getStats }) => {
     console.log('started p2p service on', keyPair.publicKey.toString('hex'))
-    const localRegistry = LocalRegistry(registryPublicKey)
+
+    const localRegistry = LocalRegistry(registryPublicKey, { skipReaderRegistry: true })
     localRegistry.connect().then(() => {
       localRegistry.register(meta, keyPair.publicKey)
     })
