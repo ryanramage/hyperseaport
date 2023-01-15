@@ -2,29 +2,23 @@ const test = require('tape')
 const ServicePublicKeyLookup = require('../lib/impl/servicePublicKeyLookup')
 
 test('inc works', t => {
-  const opts = { mode: 'static-roundRobin' }
+  const opts = { mode: 'static-roundRobin', dontRunUpdater: true }
 
-  const query = async () => {
-    return [
-      { servicePublicKey: 'a' },
-      { servicePublicKey: 'b' },
-      { servicePublicKey: 'c' }
-    ]
-  }
-  const localRegistryMock = { query }
+  const list = [
+    { servicePublicKey: 'a' },
+    { servicePublicKey: 'b' },
+    { servicePublicKey: 'c' }
+  ]
 
-  const servicePublicKeyLookup = ServicePublicKeyLookup(opts, {}, localRegistryMock, '')
+  const servicePublicKeyLookup = ServicePublicKeyLookup(opts, {}, {}, '')
 
-  const run = async () => {
-    const first = await servicePublicKeyLookup.get()
-    t.equals(first, 'a')
-    const second = await servicePublicKeyLookup.get()
-    t.equals(second, 'b')
-    const third = await servicePublicKeyLookup.get()
-    t.equals(third, 'c')
-    const forth = await servicePublicKeyLookup.get()
-    t.equals(forth, 'a')
-    t.end()
-  }
-  run()
+  const first = servicePublicKeyLookup.choose(list)
+  t.equals(first, 'a')
+  const second = servicePublicKeyLookup.choose(list)
+  t.equals(second, 'b')
+  const third = servicePublicKeyLookup.choose(list)
+  t.equals(third, 'c')
+  const forth = servicePublicKeyLookup.choose(list)
+  t.equals(forth, 'a')
+  t.end()
 })
