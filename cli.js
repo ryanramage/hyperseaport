@@ -61,7 +61,14 @@ function service (options) {
 function proxy (options) {
   const { port, role, registryPublicKey } = options
   const meta = fixMeta(role)
-  const localRegistry = LocalRegistry(registryPublicKey)
+  const opts = {}
+
+  const storageDir = options.readerStorageDir || dataDir('hyperseaport-proxy')
+  // probably need a much better name for this option
+  if (options.skipReaderRegistry) opts.skipReaderRegistry = true
+  else if (options.fastRestart) opts.readerStorage = storageDir
+
+  const localRegistry = LocalRegistry(registryPublicKey, opts)
   const seedStr = options.seed || randomBytes(32).toString('hex')
   const loadBalanceOptions = options.loadBalanceOptions || {}
   const seed = Buffer.from(seedStr, 'hex')
