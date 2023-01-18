@@ -10,6 +10,7 @@ const ServicePublicKeyLookup = require('./lib/impl/servicePublicKeyLookup')
 const Service = require('./lib/service')
 const Proxy = require('./lib/proxyDynamic')
 const dataDir = require('./lib/dataDir')
+const Web = require('./lib/web')
 
 function registry (options) {
   const seedStr = options.registrySeed || randomBytes(32).toString('hex')
@@ -23,9 +24,14 @@ function registry (options) {
     console.log('Writer started.')
     console.log(`storing in ${storageDir}`)
     const registrar = Registrar(writerRegistry, options.dhtOptions, keyPair)
-    registrar.start().then(keyPair => {
+    registrar.start().then(dht => {
       console.log('Registry started.')
       console.log(`registryPublicKey=${keyPair.publicKey.toString('hex')}`)
+      if (options.web) {
+        const node = new HyperDHT()
+        const web = Web(options, writerRegistry, node)
+        console.log('web server listening on port', options.web)
+      }
     })
   })
 }
