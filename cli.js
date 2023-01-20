@@ -29,7 +29,7 @@ function registry (options) {
       console.log(`registryPublicKey=${keyPair.publicKey.toString('hex')}`)
       if (options.web) {
         const node = new HyperDHT()
-        const web = Web(options, writerRegistry, node)
+        Web(options, writerRegistry, node)
         console.log('web server listening on port', options.web)
       }
     })
