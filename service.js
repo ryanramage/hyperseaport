@@ -13,7 +13,7 @@ module.exports = (options) => {
   // optional things
   const host = options.host || '127.0.0.1'
   const allow = options.allow // a list of publicKeys allowed to access the service
-  const localRegistry = options.localRegistry || LocalRegistry(registryPublicKey)
+  const localRegistry = options.localRegistry || LocalRegistry(registryPublicKey, { skipReaderRegistry: true })
   const meta = fixMeta(role)
   const dht = options.dht || new HyperDHT()
 

@@ -1,11 +1,11 @@
 {
   "name": "hyperseaport",
-  "version": "1.1.4",
+  "version": "2.0.0",
   "description": "service registry and tcp proxy over secure p2p",
   "main": "./index.js",
   "bin": "./cli.js",
   "scripts": {
-    "test": "standard"
+    "test": "standard && tap"
   },
   "repository": {
     "type": "git",
@@ -25,19 +25,28 @@
   },
   "homepage": "https://github.com/ryanramage/hyperseaport#readme",
   "devDependencies": {
+    "random-access-memory": "^6.1.0",
     "standard": "^16.0.4"
   },
   "dependencies": {
+    "@hyper-cmd/lib-keys": "https://github.com/prdn/hyper-cmd-lib-keys#v0.0.2",
+    "@hyper-cmd/lib-net": "https://github.com/prdn/hyper-cmd-lib-net#v0.0.7",
     "@hyperswarm/dht": "^6.4.1",
     "async": "^3.2.4",
+    "b4a": "^1.6.1",
+    "corestore": "^6.4.1",
     "getports": "^1.0.2",
-    "@hyper-cmd/lib-net": "https://github.com/prdn/hyper-cmd-lib-net#v0.0.7",
-    "@hyper-cmd/lib-keys": "https://github.com/prdn/hyper-cmd-lib-keys#v0.0.2",
+    "graceful-goodbye": "^1.2.0",
+    "hyperbee": "^2.3.0",
+    "hypercore": "^10.5.4",
+    "hyperswarm": "^4.3.5",
     "json-rpc-on-a-stream": "^1.0.0",
     "rc": "^1.2.8",
     "semver": "^7.3.5",
     "semver-store": "^0.3.0",
-    "sodium-universal": "^3.1.0"
+    "sodium-universal": "^3.1.0",
+    "tap": "^16.3.2",
+    "tape": "^5.6.1"
   },
   "volta": {
     "node": "18.12.1"

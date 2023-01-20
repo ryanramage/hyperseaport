@@ -1,14 +1,21 @@
 hyperseaport
 ============
 
-service registry and tcp proxy over secure p2p
+A p2p Service Registry (🕳🥊 a holepunch project)
 
 ![Seaport](https://web.archive.org/web/20141205152524im_/http://substack.net/images/seaport.png "Seaport")
 
-Kind of like [ngrok](https://ngrok.com) but with
+Features
 
- 1. A private registry of services and
- 2. Over p2p
+ - 📇 Add existing services (apis, dbs, etc) to the registry
+ - 💻 In just a few lines of code, node apis can be registered
+ - ⚖️ Failover and load balancing between multiple service instances
+ - 👩‍👧‍👧 run multiple versions of apis running, giving time to depreciate them
+ - 🥡 clients request versions of apis with wildcard matching
+ - 📚 clients keep local copies of a readable registry for fast lookups and replication between them
+ - 📱 an experimental web proxy to expose services to webapps
+
+Devops in a p2p world is much easier. Come aboard! ⛴ 🚢
 
 As your micro service architecture grows to span many processes on many machines just register your services and easily find and connect them together.
 
@@ -42,23 +49,28 @@ The registryPublicKey should be shared so services and consumers can connect and
 ### 2. Start a registry
 
 ```
-$ hyperseaport
-
+$ hyperseaport --web 8777
+⦖ ./cli.js --web 8777
+Writer started.
+storing in /Users/ryanr/Library/Preferences/hyperseaport
 Registry started.
 registryPublicKey=5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45
+web server listening on port 8777
 
 ```
+The registry is stored as a hyperbee in /Users/ryanr/Library/Prefrences/hyperseaport.  
+We've started with the experimental web proxy on port 8777. We'll show that off later.
 
-### 3. Register a service
+### 3. Register a service (📇 Add existing services)
 
-Here is an example that registers couchdb running on localhost port (-p) 5984 as a service.
+Here is an example that registers and existing couchdb running on localhost port (-p) 5984 as a service.
 The role (-r) of the service a semver string that represents the name and version of the running instace.
 We use the registry publicKey from step 2 to find and connect to the registry, and register our service.
 
 The code below can be run on the same different host than step 2, and it automagically connects and registers the service.
 
 ```
-$ hyperseaport service --port 5984 --role couchdb@3.2.2
+$ hyperseaport service --port 5984 --role couchdb@3.2.2 --registryPublicKey 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45
 
 started p2p service on abe213285052e5c2f2166d144afcd71e31aa5c7d72656d7b956a2c93f76d260f
 connecting to registry 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45
@@ -70,16 +82,26 @@ registered service {
   hash: 'couchdb|3.2.2|'
 }
 ```
-
 Note: for service registration the server version should be exact
 
-Note: The command here is reading ~/.config/hyperseaport for the registry. It you are on another computer pass in the registry public key
+### 4. Try out the web proxy (📱 - mobile access)
+
+Assuming the service you registered in 3 is an http service, you can now use the registry proxy (if enabled).
+
+Try some urls like
+
+ - curl localhost:8777/couchdb@3.2.2/
+ - curl localhost:8777/couchdb@3.x/some/path/on/the/service
+
+You __should__ be able to GET PUT PATCH POST etc. As you register more service you can access them via
 
 ```
-$ hyperseaport service --registryPublicKey 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45 --port 5984 --role couchdb@3.2.2
+/role@version/path/on/service
 ```
 
-### 4. Register a proxy
+This could be a one stop shop for your mobile apps. We will add more features to it (auth, etc) so it is experimental.
+
+### 5. Register a proxy
 
 This is the part that is like ngrok, or a reverse proxy. You want to USE the service somewhere else, without knowing the IP, or vpn.
 So you start a hyperseaport proxy on a port that makes it look like the service is running locally on that port.
@@ -90,7 +112,7 @@ Lookup the service by a role (r) and expose the service locally on a totally dif
 We use the registry publicKey from step 2 to find and connect to the registry, and find the service.
 
 ```
-$ hyperseaport proxy --port 5985 --role couchdb@3.x
+$ hyperseaport proxy --port 5985 --role couchdb@3.x --registryPublicKey 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45
 
 connecting to registry 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45
 connected to registry
@@ -111,12 +133,6 @@ proxy from  5985 to p2p service abe213285052e5c2f2166d144afcd71e31aa5c7d72656d7b
 
 Note: for service discovery, the version can be a semver range.
 
-Note: The command here is reading ~/.config/hyperseaport for the registry. It you are on another computer pass in the registry public key
-
-```
-$ hyperseaport proxy --registryPublicKey 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45 --port 5985 --role couchdb@3.x
-```
-
 ### 5. Use the service
 
 Now port 5985 is proxied to the remote service without knowing where it is. Magic. Call it normally
@@ -129,7 +145,7 @@ $ curl http://localhost:5985
 
 # Node Usage
 
-Create a service
+### Create a service (💻 In just a few lines of code, node apis can be registered)
 
 ```
 const {Service, KeyPair} = require('hypersearport')

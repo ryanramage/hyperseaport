@@ -4,21 +4,35 @@ const HyperDHT = require('@hyperswarm/dht')
 const fixMeta = require('./lib/fixMeta')
 const randomBytes = require('./lib/randomBytes')
 const LocalRegistry = require('./lib/localRegistry')
-const RegistryServer = require('./lib/registryServer')
-const SimpleMemoryRegistry = require('./lib/impl/simpleMemoryRegistry')
+const Registrar = require('./lib/registrar')
+const WriterRegistry = require('./lib/impl/writerRegistry')
+const ServicePublicKeyLookup = require('./lib/impl/servicePublicKeyLookup')
 const Service = require('./lib/service')
-const Proxy = require('./lib/proxy')
+const Proxy = require('./lib/proxyDynamic')
+const dataDir = require('./lib/dataDir')
+const Web = require('./lib/web')
 
 function registry (options) {
   const seedStr = options.registrySeed || randomBytes(32).toString('hex')
   const seed = Buffer.from(seedStr, 'hex')
   const keyPair = HyperDHT.keyPair(seed)
 
-  const registry = SimpleMemoryRegistry()
-  const registryServer = RegistryServer(registry, options.dhtOptions, keyPair)
-  registryServer.start().then(keyPair => {
-    console.log('Registry started')
-    console.log(`registryPublicKey=${keyPair.publicKey.toString('hex')}`)
+  const storageDir = options.registryDir || dataDir('hyperseaport')
+
+  const writerRegistry = WriterRegistry(storageDir)
+  writerRegistry.start().then(writerKey => {
+    console.log('Writer started.')
+    console.log(`storing in ${storageDir}`)
+    const registrar = Registrar(writerRegistry, options.dhtOptions, keyPair)
+    registrar.start().then(dht => {
+      console.log('Registry started.')
+      console.log(`registryPublicKey=${keyPair.publicKey.toString('hex')}`)
+      if (options.web) {
+        const node = new HyperDHT()
+        Web(options, writerRegistry, node)
+        console.log('web server listening on port', options.web)
+      }
+    })
   })
 }
 
@@ -38,7 +52,8 @@ function service (options) {
   const opts = { host, port, dht, keyPair }
   Service(opts).then(({ dht, getStats }) => {
     console.log('started p2p service on', keyPair.publicKey.toString('hex'))
-    const localRegistry = LocalRegistry(registryPublicKey)
+
+    const localRegistry = LocalRegistry(registryPublicKey, { skipReaderRegistry: true })
     localRegistry.connect().then(() => {
       localRegistry.register(meta, keyPair.publicKey)
     })
@@ -52,25 +67,26 @@ function service (options) {
 function proxy (options) {
   const { port, role, registryPublicKey } = options
   const meta = fixMeta(role)
-  const localRegistry = LocalRegistry(registryPublicKey)
+  const opts = {}
+
+  const storageDir = options.readerStorageDir || dataDir('hyperseaport-proxy')
+  // probably need a much better name for this option
+  if (options.skipReaderRegistry) opts.skipReaderRegistry = true
+  else if (options.fastRestart) opts.readerStorage = storageDir
+
+  const localRegistry = LocalRegistry(registryPublicKey, opts)
   const seedStr = options.seed || randomBytes(32).toString('hex')
+  const loadBalanceOptions = options.loadBalanceOptions || {}
   const seed = Buffer.from(seedStr, 'hex')
   const keyPair = HyperDHT.keyPair(seed)
   const dht = new HyperDHT(keyPair)
   localRegistry.connect().then(() => {
     console.log('connected to registry')
-    localRegistry.waitFor(meta).then(servicePublicKey => {
-      console.log('starting', port, servicePublicKey)
-      Proxy({ port, servicePublicKey, dht }).then(({ getStats }) => {
-        console.log('proxy from ', port, 'to p2p service', servicePublicKey)
-        process.once('SIGINT', function () {
-          dht.destroy()
-        })
+    const servicePublicKeyLookup = ServicePublicKeyLookup(loadBalanceOptions, meta, localRegistry, keyPair)
+    Proxy({ port, servicePublicKeyLookup, dht }).then(({ getStats }) => {
+      process.once('SIGINT', function () {
+        dht.destroy()
       })
-    }).catch(e => {
-      console.log('unable to find service', e)
-      localRegistry.destroy()
-      process.exit(-1)
     })
   })
 }
