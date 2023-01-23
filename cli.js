@@ -96,6 +96,8 @@ function web (options) {
   const opts = { web }
   const storageDir = options.readerStorageDir || dataDir('hyperseaport-web')
 
+  if (!web && options.port) opts.web = options.port // allow port to match other invocations
+
   const regOpts = { skipReaderRegistry: false, readerStorage: storageDir }
   const localRegistry = LocalRegistry(registryPublicKey, regOpts)
   const seedStr = options.seed || randomBytes(32).toString('hex')
