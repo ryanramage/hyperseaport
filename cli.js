@@ -49,13 +49,16 @@ function service (options) {
   const seed = Buffer.from(seedStr, 'hex')
   const keyPair = HyperDHT.keyPair(seed)
 
+  const servicePublicKey = keyPair.publicKey.toString('hex')
   const opts = { host, port, dht, keyPair }
   Service(opts).then(({ dht, getStats }) => {
-    console.log('started p2p service on', keyPair.publicKey.toString('hex'))
+    console.log('started p2p service on', servicePublicKey) 
 
     const localRegistry = LocalRegistry(registryPublicKey, { skipReaderRegistry: true })
     localRegistry.connect().then(() => {
       localRegistry.register(meta, keyPair.publicKey)
+
+      logger(options, localRegistry, servicePublicKey)
     })
     process.once('SIGINT', function () {
       dht.destroy()
@@ -113,6 +116,12 @@ function web (options) {
       node.destroy()
     })
   })
+}
+
+function logger (options, publicKey, localRegistry) {
+  const { stdin } = options
+  if (!stdin) return
+  localRegistry.logger(process.stdin, localRegistry)
 }
 
 const options = rc('hyperseaport')
