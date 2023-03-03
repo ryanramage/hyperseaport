@@ -91,6 +91,13 @@ function proxy (options) {
   })
 }
 
+process.on('uncaughtException', (err, origin) => {
+  console.log('Caught exception:', err, 'Exception origin:', origin)
+})
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', promise, 'reason:', reason)
+})
+
 const options = rc('hyperseaport')
 const command = options._[0]
 
