@@ -90,13 +90,13 @@ Assuming the service you registered in 3 is an http service, you can now use the
 
 Try some urls like
 
- - curl localhost:8777/couchdb@3.2.2/
- - curl localhost:8777/couchdb@3.x/some/path/on/the/service
-
-You __should__ be able to GET PUT PATCH POST etc. As you register more service you can access them via
+ - curl localhost:8777/role/couchdb@3.2.2/
+ - curl localhost:8777/role/couchdb@3.x/some/path/on/the/service
+ - curl localhost:8777/list/couchdb@3.x
+ - curl localhost:877/instance/abe213285052e5c2f2166d144afcd71e31aa5c7d72656d7b956a2c93f76d260f/some/path/on/this/service
 
 ```
-/role@version/path/on/service
+/role/${role@version}/path/on/service
 ```
 
 This could be a one stop shop for your mobile apps. We will add more features to it (auth, etc) so it is experimental.
