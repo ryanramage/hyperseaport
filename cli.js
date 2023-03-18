@@ -94,9 +94,30 @@ function proxy (options) {
 process.on('uncaughtException', (err, origin) => {
   console.log('Caught exception:', err, 'Exception origin:', origin)
 })
-process.on('unhandledRejection', (reason, promise) => {
-  console.log('Unhandled Rejection at:', promise, 'reason:', reason)
-})
+
+function web (options) {
+  const { web, registryPublicKey } = options
+  const opts = { web }
+  const storageDir = options.readerStorageDir || dataDir('hyperseaport-web')
+
+  if (!web && options.port) opts.web = options.port // allow port to match other invocations
+
+  const regOpts = { skipReaderRegistry: false, readerStorage: storageDir }
+  const localRegistry = LocalRegistry(registryPublicKey, regOpts)
+  const seedStr = options.seed || randomBytes(32).toString('hex')
+  const seed = Buffer.from(seedStr, 'hex')
+  const keyPair = HyperDHT.keyPair(seed)
+  const node = new HyperDHT(keyPair)
+
+  localRegistry.connect().then(() => {
+    console.log('connected to registry')
+    Web(opts, localRegistry, node)
+    console.log('web server listening on port', options.web)
+    process.once('SIGINT', function () {
+      node.destroy()
+    })
+  })
+}
 
 const options = rc('hyperseaport')
 const command = options._[0]
@@ -113,4 +134,5 @@ if (command === 'seed') {
 if (command === 'registry') registry(options)
 else if (command === 'service') service(options)
 else if (command === 'proxy') proxy(options)
+else if (command === 'web') web(options)
 else registry(options)

@@ -101,6 +101,13 @@ You __should__ be able to GET PUT PATCH POST etc. As you register more service y
 
 This could be a one stop shop for your mobile apps. We will add more features to it (auth, etc) so it is experimental.
 
+If you dont want to start the web proxy with the registry, or you want more redundand web proxies (round robin dns), you can start them up
+
+```
+$ hyperseaport web --port 5984 --registryPublicKey 5b64a8956d8f2404c4f4b4e6f402ef439f610f7fe297718093641359130b0d45
+
+```
+
 ### 5. Register a proxy
 
 This is the part that is like ngrok, or a reverse proxy. You want to USE the service somewhere else, without knowing the IP, or vpn.
