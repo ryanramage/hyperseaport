@@ -1,6 +1,6 @@
 {
   "name": "hyperseaport",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "service registry and tcp proxy over secure p2p",
   "main": "./index.js",
   "bin": "./cli.js",
