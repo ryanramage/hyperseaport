@@ -1,4 +1,4 @@
-const HyperDHT = require('@hyperswarm/dht')
+const HyperDHT = require('hyperdht')
 const fixMeta = require('./lib/fixMeta')
 const Service = require('./lib/service')
 const LocalRegistry = require('./lib/localRegistry')

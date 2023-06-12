@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const rc = require('rc')
-const HyperDHT = require('@hyperswarm/dht')
+const HyperDHT = require('hyperdht')
 const fixMeta = require('./lib/fixMeta')
 const randomBytes = require('./lib/randomBytes')
 const LocalRegistry = require('./lib/localRegistry')
