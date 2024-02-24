@@ -1,4 +1,4 @@
-const HyperDHT = require('@hyperswarm/dht')
+const HyperDHT = require('hyperdht')
 const randomBytes = require('./lib/randomBytes')
 
 module.exports = (options) => {
