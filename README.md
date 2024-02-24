@@ -186,24 +186,21 @@ process.once('SIGINT', function () {
 Consume the service from another process
 
 ```
-const {Consumer} = require('hypersearport')
+import { Consumer } from 'hyperseaport'
 
 const registryPublicKey = process.argv[2] // we need one thing from the cli
-const roles = ['helloworld@1.0.0']
+const roles = ['ollama@1.0.0']
 const options = { registryPublicKey }
 
 // notice we could pass in a bunch of roles we need in the array
 const consumer = Consumer(roles, options)
 const [helloworld] = await consumer.setup()
-
-const url = `http://localhost:${helloworld.port}`
-const resp = await fetch(url)
-const data = resp.text()
-console.log(data) // 'Hello, World!'
+const resp = await fetch(helloworld.url)
+const data = await resp.text()
+console.log(data) // 'ollama is running'
 
 // clean up when done
 consumer.destroy().then(() => process.exit())
-
 
 ```
 
